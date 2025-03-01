@@ -7,6 +7,7 @@ import java.time.LocalDate;
 import java.util.*;
 import java.nio.charset.StandardCharsets;
 import java.security.*;
+import motorph.classes.helper.*;
 import motorph.models.objects.*;
 
 public class InventoryProcess {
@@ -19,6 +20,7 @@ public class InventoryProcess {
     private static final Scanner scanner = new Scanner(System.in); // INITIALIZE SCANNER TO TAKE USER INPUTS
     // AN ARRAY TO HOLD ALL THE AVAILABLE BRANDS
     private final String[] brands = {"honda", "kawasaki", "kymco", "suzuki", "yamaha"};
+    private MotorcycleBST bst = new MotorcycleBST();
 
     public InventoryProcess() {
         // INITIALIZE HASH MAP
@@ -64,6 +66,9 @@ public class InventoryProcess {
         // ADD THE CREATED MOTORCYCLE OBJECT TO THE INVENTORY MAP
         inventory.put(hashedEngineNo, motorcycle);
 
+        // ADD THE CREATED MOTORCYCLE OBJECT TO THE BINARY SEARCH TREE
+        bst.Insert(motorcycle);
+
         System.out.println(brand.substring(0, 1).toUpperCase() + brand.substring(1)
                 + " item with engine number " + engineNo + " has been added.");
     }
@@ -76,8 +81,11 @@ public class InventoryProcess {
         String engineNo = scanner.nextLine();
         String hashedEngineNo = HashEngineNumber(engineNo);
 
-        // TRIES TO DELETE THE SUPPLIED ENGINE NUMBER OF THE MOTORCYCLE ITEM FROM THE INVENTORY USING THE HASHED ENGINE NUMBER AS THE KEY
+        // DELETE THE SUPPLIED ENGINE NUMBER OF THE MOTORCYCLE ITEM FROM THE INVENTORY USING THE HASHED ENGINE NUMBER AS THE KEY
         Motorcycle removedItem = inventory.remove(hashedEngineNo);
+        
+        //  DELETE THE SUPPLIED ENGINE NUMBER OF THE MOTORCYCLE ITEM FROM THE BINARY SEARCH TREE USING THE HASHED ENGINE NUMBER AS THE KEY
+        bst.Delete(engineNo);
 
         // VALIDATION CHECK: IF THE ITEM WAS REMOVED
         if (removedItem != null) {
@@ -310,21 +318,10 @@ public class InventoryProcess {
         String criteria = scanner.nextLine().toLowerCase();
 
         // INITIALIZE A HASHMAP NAMED [result] THAT WILL HOLD THE SEARCH RESULTS
-        Map<String, Motorcycle> result = new HashMap<>();
-
-        // LOOP THROUGH ALL THE CONTENTS OF THE INVENTORY HASHMAP
-        for (Map.Entry<String, Motorcycle> entry : inventory.entrySet()) {
-            Motorcycle m = entry.getValue();
-
-            // CHECK IF THE CRITERIA MATCHES ANY OF THE INVENTORY ITEMS
-            if (MatchesCriteria(m, criteria)) {
-                // ADD THE MATCHING ITEM TO THE RESULT HASHMAP USING THE HASHED ENGINE NUMBER AS KEY
-                result.put(entry.getKey(), m);
-            }
-        }
+        Map<String, Motorcycle> results = bst.Search(criteria);
 
         // CALLS THE METHOD TO DISPLAY RESULTS AND PASSES THE HASHMAP AS A PARAMETER
-        DisplayResults(result);
+        DisplayResults(results);
     }
 
     private int GetValidChoice() {
@@ -393,15 +390,6 @@ public class InventoryProcess {
         return new Motorcycle(brand, LocalDate.now(), engineNo, "On-hand", "New", quantity);
     }
 
-    // METHOD THAT WILL GET THE MOTORCYCLE THAT MATCH THE CRITERIA
-    private boolean MatchesCriteria(Motorcycle m, String criteria) {
-        return m.GetBrand().toLowerCase().contains(criteria)
-                || m.GetCreatedOn().toString().contains(criteria)
-                || m.GetEngineNumber().toLowerCase().contains(criteria)
-                || m.GetStatus().toLowerCase().contains(criteria)
-                || m.GetStockLabel().toLowerCase().contains(criteria);
-    }
-
     // METHOD TO PRINT THE RESULTS OF THE SEARCH
     private void DisplayResults(Map<String, Motorcycle> result) {
         // REUSE THE METHOD TO PRINT THE TABLE FOR SEARCH RESULTS
@@ -454,6 +442,7 @@ public class InventoryProcess {
         return String.valueOf(engineNumber.hashCode());
     }
      */
+    
     // METHOD TO HASH ENGINE NUMBER USING SHA-256 
     private String HashEngineNumber(String engineNo) {
         try {
@@ -472,14 +461,28 @@ public class InventoryProcess {
     // ADDS MULTIPLE SAMPLE DATA TO THE INVENTORY
     private void AddSampleData() {
         // ADD SAMPLE HONDA ITEM
-        inventory.put(HashEngineNumber("ENG123456"), new Motorcycle("Honda", LocalDate.now(), "ENG123456", "On-hand", "New", 3));
+        Motorcycle honda = new Motorcycle("Honda", LocalDate.now(), "ENG123456", "On-hand", "New", 3);
+        inventory.put(HashEngineNumber("ENG123456"), honda); // ADD TO INVENTORY
+        bst.Insert(honda); // ADD TO BST
+
         // ADD SAMPLE KYMCO ITEM
-        inventory.put(HashEngineNumber("ENG654321"), new Motorcycle("Kymco", LocalDate.now(), "ENG654321", "Sold", "Used", 1));
+        Motorcycle kymco = new Motorcycle("Kymco", LocalDate.now(), "ENG654321", "Sold", "Used", 1);
+        inventory.put(HashEngineNumber("ENG654321"), kymco); // ADD TO INVENTORY
+        bst.Insert(kymco); // ADD TO BST
+
         // ADD SAMPLE YAMAHA ITEM
-        inventory.put(HashEngineNumber("ENG789012"), new Motorcycle("Yamaha", LocalDate.now(), "ENG789012", "On-hand", "New", 5));
+        Motorcycle yamaha = new Motorcycle("Yamaha", LocalDate.now(), "ENG789012", "On-hand", "New", 5);
+        inventory.put(HashEngineNumber("ENG789012"), yamaha); // ADD TO INVENTORY
+        bst.Insert(yamaha); // ADD TO BST
+
         // ADD SAMPLE SUZUKI ITEM
-        inventory.put(HashEngineNumber("ENG456789"), new Motorcycle("Suzuki", LocalDate.now(), "ENG456789", "Sold", "Used", 2));
+        Motorcycle suzuki = new Motorcycle("Suzuki", LocalDate.now(), "ENG456789", "Sold", "Used", 2);
+        inventory.put(HashEngineNumber("ENG456789"), suzuki); // ADD TO INVENTORY
+        bst.Insert(suzuki); // ADD TO BST
+
         // ADD SAMPLE KAWASAKI ITEM
-        inventory.put(HashEngineNumber("ENG987654"), new Motorcycle("Kawasaki", LocalDate.now(), "ENG987654", "On-hand", "New", 4));
+        Motorcycle kawasaki = new Motorcycle("Kawasaki", LocalDate.now(), "ENG987654", "On-hand", "New", 4);
+        inventory.put(HashEngineNumber("ENG987654"), kawasaki); // ADD TO INVENTORY
+        bst.Insert(kawasaki); // ADD TO BST
     }
 }
