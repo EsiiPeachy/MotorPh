@@ -38,24 +38,14 @@ public class MotorPh {
                 case 2 ->
                     inventoryProcess.DeleteItem();
                 case 3 ->
-                    inventoryProcess.BubbleSort();
-                case 4 ->
                     inventoryProcess.SortInventory();
-                case 5 ->
+                case 4 ->
                     inventoryProcess.SearchItem();
-                case 6 -> {
+                case 5 -> {
                     ExitProgram();
                     return;
                 }
 
-                case 7 ->
-                    inventoryProcess.AscendingBubbleSort();
-                case 8 ->
-                    inventoryProcess.DescendingBubbleSort();
-                case 9 ->
-                    inventoryProcess.AscendingInsertionSort();
-                case 10 ->
-                    inventoryProcess.DescendingInsertionSort();
                 default -> {
                 }
             }
@@ -73,10 +63,9 @@ public class MotorPh {
         System.out.println("\n===== Inventory Menu =====");
         System.out.println("1. Add Item");
         System.out.println("2. Delete Item");
-        System.out.println("3. Sort by Bubble Sort");
-        System.out.println("4. Sort Inventory");
-        System.out.println("5. Search Item");
-        System.out.println("6. Exit");
+        System.out.println("3. Sort Inventory");
+        System.out.println("4. Search Item");
+        System.out.println("5. Exit");
         System.out.print("Enter choice: ");
     }
 

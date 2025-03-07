@@ -1,3 +1,5 @@
-arielle\confesor\motorph\models\objects\Motorcycle.class
-arielle\confesor\motorph\MotorPh.class
-arielle\confesor\motorph\process\InventoryProcess.class
+motorph\classes\process\InventoryProcess.class
+motorph\classes\helper\MotorcycleAVL.class
+motorph\models\objects\Motorcycle.class
+motorph\models\common\TreeNode.class
+motorph\MotorPh.class

@@ -1,5 +1,5 @@
 /**
- * VERSION CONTROL : 1.1
+ * VERSION CONTROL : 1.2
  */
 package motorph.classes.process;
 
@@ -20,7 +20,7 @@ public class InventoryProcess {
     private static final Scanner scanner = new Scanner(System.in); // INITIALIZE SCANNER TO TAKE USER INPUTS
     // AN ARRAY TO HOLD ALL THE AVAILABLE BRANDS
     private final String[] brands = {"honda", "kawasaki", "kymco", "suzuki", "yamaha"};
-    private MotorcycleBST bst = new MotorcycleBST();
+    private MotorcycleAVL avl = new MotorcycleAVL();
 
     public InventoryProcess() {
         // INITIALIZE HASH MAP
@@ -67,7 +67,7 @@ public class InventoryProcess {
         inventory.put(hashedEngineNo, motorcycle);
 
         // ADD THE CREATED MOTORCYCLE OBJECT TO THE BINARY SEARCH TREE
-        bst.Insert(motorcycle);
+        avl.Insert(motorcycle);
 
         System.out.println(brand.substring(0, 1).toUpperCase() + brand.substring(1)
                 + " item with engine number " + engineNo + " has been added.");
@@ -83,9 +83,9 @@ public class InventoryProcess {
 
         // DELETE THE SUPPLIED ENGINE NUMBER OF THE MOTORCYCLE ITEM FROM THE INVENTORY USING THE HASHED ENGINE NUMBER AS THE KEY
         Motorcycle removedItem = inventory.remove(hashedEngineNo);
-        
+
         //  DELETE THE SUPPLIED ENGINE NUMBER OF THE MOTORCYCLE ITEM FROM THE BINARY SEARCH TREE USING THE HASHED ENGINE NUMBER AS THE KEY
-        bst.Delete(engineNo);
+        avl.Delete(engineNo);
 
         // VALIDATION CHECK: IF THE ITEM WAS REMOVED
         if (removedItem != null) {
@@ -99,18 +99,22 @@ public class InventoryProcess {
 
     public void SortInventory() {
         while (true) {
-            System.out.println("\n===== Select Sort Method =====");
-            System.out.println("1. Bubble Sort");
-            System.out.println("2. Insertion Sort");
+            System.out.println("\n===== Select Sort Order =====");
+            System.out.println("1. Ascending");
+            System.out.println("2. Descending");
             System.out.println("3. Back");
             System.out.print("Enter choice: ");
 
             int choice = GetValidChoice();
             switch (choice) {
-                case 1 ->
-                    BubbleSort();
-                case 2 ->
-                    InsertionSort();
+                case 1 -> {
+                    MergeSort(0, inventory.size() - 1, true);
+                    return;
+                }
+                case 2 -> {
+                    MergeSort(0, inventory.size() - 1, false);
+                    return;
+                }
                 case 3 -> {
                     System.out.println("Returning to the main menu...");
                     return;
@@ -119,193 +123,6 @@ public class InventoryProcess {
                     System.out.println("Invalid choice. Try again.");
             }
         }
-    }
-
-    public void BubbleSort() {
-        int choice = SelectSortOrder();
-        switch (choice) {
-            case 1 ->
-                AscendingBubbleSort();
-            case 2 ->
-                DescendingBubbleSort();
-            case 3 -> {
-                System.out.println("Returning to the main menu...");
-                return;
-            }
-            default -> {
-            }
-        }
-        DisplayInventory();
-    }
-
-    public void InsertionSort() {
-        int choice = SelectSortOrder();
-        switch (choice) {
-            case 1 ->
-                AscendingInsertionSort();
-            case 2 ->
-                DescendingInsertionSort();
-            case 3 -> {
-                System.out.println("Returning to the main menu...");
-                return;
-            }
-            default -> {
-            }
-        }
-        DisplayInventory();
-    }
-
-    /**
-     * SORTS THE INVENTORY TO ASCENDING ORDER USING THE BUBBLE SORT ALGORITHM
-     * THE ALGORITHM SORTS THE INVENTORY BY ENGINE NUMBER
-     */
-    public void AscendingBubbleSort() {
-        // EXTRACT THE VALUES (MOTORCYCLE OBJECTS) INTO A LIST
-        List<Motorcycle> motorcycles = new ArrayList<>(inventory.values());
-
-        // STORES THE NUMBER OF ITEMS IN THE INVENTORY LINKEDLIST TO A VARIABLE
-        int n = inventory.size();
-        // OUTER LOOP CONTROLS THE PASSES THROUGH THE LIST
-        for (int i = 0; i < n - 1; i++) {
-            // INNER LOOP CONTROLS THE COMPARISON AND SWAPPING
-            for (int j = 0; j < n - i - 1; j++) {
-                /**
-                 * COMPARES THE ENGINE NUMBERS OF THE CURRENT AND NEXT
-                 * MOTORCYCLE IF motorcycles[j].engineNo >
-                 * motorcycles[j+1].engineNo, SWAP THEM
-                 */
-                if (motorcycles.get(j).GetEngineNumber().compareTo(motorcycles.get(j + 1).GetEngineNumber()) > 0) {
-                    // SWAP MOTORCYCLES
-                    Motorcycle temp = motorcycles.get(j);
-                    motorcycles.set(j, motorcycles.get(j + 1));
-                    motorcycles.set(j + 1, temp);
-                }
-            }
-        }
-        // CLEAR THE ORIGINAL MAP AND REPOPULATE IT WITH THE SORTED LIST
-        inventory.clear();
-        for (Motorcycle m : motorcycles) {
-            String hashedEngineNo = HashEngineNumber(m.GetEngineNumber());
-            inventory.put(hashedEngineNo, m);
-        }
-
-        // PRINT CONFIRMATION MESSAGE
-        System.out.println("Inventory sorted using Bubble Sort by Engine Number (Ascending).");
-    }
-
-    /**
-     * SORTS THE INVENTORY TO DESCENDING ORDER USING THE BUBBLE SORT ALGORITHM
-     * THE ALGORITHM SORTS THE INVENTORY BY ENGINE NUMBER
-     */
-    public void DescendingBubbleSort() {
-        // EXTRACT THE VALUES (MOTORCYCLE OBJECTS) INTO A LIST
-        List<Motorcycle> motorcycles = new ArrayList<>(inventory.values());
-
-        // STORES THE NUMBER OF ITEMS IN THE INVENTORY LINKEDLIST TO A VARIABLE
-        int n = inventory.size();
-        // OUTER LOOP CONTROLS THE PASSES THROUGH THE LIST
-        for (int i = 0; i < n - 1; i++) {
-            // INNER LOOP CONTROLS THE COMPARISON AND SWAPPING
-            for (int j = 0; j < n - i - 1; j++) {
-                /**
-                 * COMPARES THE ENGINE NUMBERS OF THE CURRENT AND NEXT
-                 * MOTORCYCLE IF motorcycles[j].engineNo <
-                 * motorcycles[j+1].engineNo, SWAP THEM
-                 */
-                if (motorcycles.get(j).GetEngineNumber().compareTo(motorcycles.get(j + 1).GetEngineNumber()) < 0) {
-                    // SWAP MOTORCYCLES
-                    Motorcycle temp = motorcycles.get(j);
-                    motorcycles.set(j, motorcycles.get(j + 1));
-                    motorcycles.set(j + 1, temp);
-                }
-            }
-        }
-        // CLEAR THE ORIGINAL MAP AND REPOPULATE IT WITH THE SORTED LIST
-        inventory.clear();
-        for (Motorcycle m : motorcycles) {
-            String hashedEngineNo = HashEngineNumber(m.GetEngineNumber());
-            inventory.put(hashedEngineNo, m);
-        }
-        // PRINT CONFIRMATION MESSAGE
-        System.out.println("Inventory sorted using Bubble Sort by Engine Number (Descending).");
-    }
-
-    /**
-     * SORTS THE INVENTORY TO ASCENDING ORDER USING THE INSERTION SORT ALGORITHM
-     * ALGORITHM SORTS THE INVENTORY BY BRAND
-     */
-    public void AscendingInsertionSort() {
-        // EXTRACT THE VALUES (MOTORCYCLE OBJECTS) INTO A LIST
-        List<Motorcycle> motorcycles = new ArrayList<>(inventory.values());
-
-        // STORES THE NUMBER OF ITEMS IN THE INVENTORY
-        int n = motorcycles.size();
-
-        // LOOP THROUGH THE WHOLE INVENTORY
-        for (int i = 1; i < n; i++) {
-            // GETS THE MOTORCYCLE AT INDEX [i] AND STORES IT TO A VARIABLE NAMED [key]
-            Motorcycle key = motorcycles.get(i);
-            // INITIALIZE A TEMPORARY INTEGER THAT WILL SERVE AS THE PREVIOUS INDEX
-            int j = i - 1;
-
-            // WHILE LOOP TO SHIFT THE ELEMENTS UNTIL [key] IS IN THE RIGHT PLACE
-            while (j >= 0 && motorcycles.get(j).GetBrand().compareTo(key.GetBrand()) > 0) {
-                // SHIFTS THE ITEM AT [j+1] TO THE RIGHT, MAKING ROOM FOR THE CORRECT ELEMENT
-                motorcycles.set(j + 1, motorcycles.get(j));
-                j--;
-            }
-            // INSERTS THE KEY TO INDEX [j+1]
-            motorcycles.set(j + 1, key);
-        }
-
-        // CLEAR THE ORIGINAL MAP AND REPOPULATE IT WITH THE SORTED LIST
-        inventory.clear();
-        for (Motorcycle m : motorcycles) {
-            String hashedEngineNo = HashEngineNumber(m.GetEngineNumber());
-            inventory.put(hashedEngineNo, m);
-        }
-
-        // PRINT CONFIRMATION MESSAGE
-        System.out.println("Inventory sorted using Insertion Sort by Brand (Ascending).");
-    }
-
-    /**
-     * SORTS THE INVENTORY TO DESCENDING ORDER USING THE INSERTION SORT
-     * ALGORITHM SORTS THE INVENTORY BY BRAND
-     */
-    public void DescendingInsertionSort() {
-        // EXTRACT THE VALUES (MOTORCYCLE OBJECTS) INTO A LIST
-        List<Motorcycle> motorcycles = new ArrayList<>(inventory.values());
-
-        // STORES THE NUMBER OF ITEMS IN THE INVENTORY
-        int n = motorcycles.size();
-
-        // LOOP THROUGH THE WHOLE INVENTORY
-        for (int i = 1; i < n; i++) {
-            // GETS THE MOTORCYCLE AT INDEX [i] AND STORES IT TO A VARIABLE NAMED [key]
-            Motorcycle key = motorcycles.get(i);
-            // INITIALIZE A TEMPORARY INTEGER THAT WILL SERVE AS THE PREVIOUS INDEX
-            int j = i - 1;
-
-            // WHILE LOOP TO SHIFT THE ELEMENTS UNTIL [key] IS IN THE RIGHT PLACE
-            while (j >= 0 && motorcycles.get(j).GetBrand().compareTo(key.GetBrand()) < 0) {
-                // SHIFTS THE ITEM AT [j+1] TO THE RIGHT, MAKING ROOM FOR THE CORRECT ELEMENT
-                motorcycles.set(j + 1, motorcycles.get(j));
-                j--;
-            }
-            // INSERTS THE KEY TO INDEX [j+1]
-            motorcycles.set(j + 1, key);
-        }
-
-        // CLEAR THE ORIGINAL MAP AND REPOPULATE IT WITH THE SORTED LIST
-        inventory.clear();
-        for (Motorcycle m : motorcycles) {
-            String hashedEngineNo = HashEngineNumber(m.GetEngineNumber());
-            inventory.put(hashedEngineNo, m);
-        }
-
-        // PRINT CONFIRMATION MESSAGE
-        System.out.println("Inventory sorted using Insertion Sort by Brand (Descending).");
     }
 
     /**
@@ -318,10 +135,77 @@ public class InventoryProcess {
         String criteria = scanner.nextLine().toLowerCase();
 
         // INITIALIZE A HASHMAP NAMED [result] THAT WILL HOLD THE SEARCH RESULTS
-        Map<String, Motorcycle> results = bst.Search(criteria);
+        Set<String> keys = avl.Search(criteria);
+
+        Map<String, Motorcycle> results = new HashMap<>();
+        // LOOP THROUGH THE ENGINE NUMBERS AND RETRIEVE THE CORRESPONDING MOTORCYCLE OBJECTS
+        for (String engineNumber : keys) {
+            Motorcycle motorcycle = inventory.get(engineNumber);
+            if (motorcycle != null) {
+                results.put(engineNumber, motorcycle);
+            }
+        }
 
         // CALLS THE METHOD TO DISPLAY RESULTS AND PASSES THE HASHMAP AS A PARAMETER
         DisplayResults(results);
+    }
+
+    /**
+     * MERGE SORT RECURSIVE FUNCTION
+     */
+    private void MergeSort(int left, int right, boolean ascending) {
+        // EXTRACT VALUES INTO A LIST
+        List<Motorcycle> motorcycles = new ArrayList<>(inventory.values());
+
+        if (left < right) {
+            int mid = left + (right - left) / 2;
+
+            // RECURSIVELY SORT LEFT & RIGHT HALVES
+            MergeSort(left, mid, ascending);
+            MergeSort(mid + 1, right, ascending);
+
+            // MERGE THE SORTED HALVES
+            Merge(motorcycles, left, mid, right, ascending);
+        }
+
+        // REPOPULATE THE INVENTORY
+        inventory.clear();
+        for (Motorcycle m : motorcycles) {
+            String hashedEngineNo = HashEngineNumber(m.GetEngineNumber());
+            inventory.put(hashedEngineNo, m);
+        }
+    }
+
+    /**
+     * MERGES TWO SORTED HALVES
+     */
+    private void Merge(List<Motorcycle> list, int left, int mid, int right, boolean ascending) {
+        int n1 = mid - left + 1;
+        int n2 = right - mid;
+
+        // TEMP ARRAYS
+        List<Motorcycle> leftList = new ArrayList<>(list.subList(left, mid + 1));
+        List<Motorcycle> rightList = new ArrayList<>(list.subList(mid + 1, right + 1));
+
+        int i = 0, j = 0, k = left;
+
+        // MERGE LOGIC
+        while (i < n1 && j < n2) {
+            int comparison = leftList.get(i).GetEngineNumber().compareTo(rightList.get(j).GetEngineNumber());
+            if ((ascending && comparison <= 0) || (!ascending && comparison > 0)) {
+                list.set(k++, leftList.get(i++));
+            } else {
+                list.set(k++, rightList.get(j++));
+            }
+        }
+
+        // COPY REMAINING ELEMENTS
+        while (i < n1) {
+            list.set(k++, leftList.get(i++));
+        }
+        while (j < n2) {
+            list.set(k++, rightList.get(j++));
+        }
     }
 
     private int GetValidChoice() {
@@ -334,25 +218,6 @@ public class InventoryProcess {
         }
         // IF THE USER INPUT IS A NUMBER, RETURN THE VALUE BACK TO WHERE THE METHOD IS CALLED FROM/ 
         return scanner.nextInt();
-    }
-
-    private int SelectSortOrder() {
-        while (true) {
-            System.out.println("\n===== Select Sort Order =====");
-            System.out.println("1. Ascending");
-            System.out.println("2. Descending");
-            System.out.println("3. Back");
-            System.out.print("Enter choice: ");
-
-            int choice = GetValidChoice();
-            if (choice == 1 || choice == 2) {
-                return choice;
-            } else if (choice == 3) {
-                return 3; // Signals exit
-            } else {
-                System.out.println("Invalid choice. Try again.");
-            }
-        }
     }
 
     // METHOD THAT ASKS THE USER TO SELECT A VALID BRAND
@@ -435,14 +300,6 @@ public class InventoryProcess {
         System.out.println();
     }
 
-    /*
-    //  METHOD TO HASH THE ENGINE NUMBER
-    private String HashEngineNumber(String engineNumber) {
-        // USE JAVA'S BUILT-IN HASHING MECHANISM
-        return String.valueOf(engineNumber.hashCode());
-    }
-     */
-    
     // METHOD TO HASH ENGINE NUMBER USING SHA-256 
     private String HashEngineNumber(String engineNo) {
         try {
@@ -463,26 +320,26 @@ public class InventoryProcess {
         // ADD SAMPLE HONDA ITEM
         Motorcycle honda = new Motorcycle("Honda", LocalDate.now(), "ENG123456", "On-hand", "New", 3);
         inventory.put(HashEngineNumber("ENG123456"), honda); // ADD TO INVENTORY
-        bst.Insert(honda); // ADD TO BST
+        avl.Insert(honda); // ADD TO BST
 
         // ADD SAMPLE KYMCO ITEM
         Motorcycle kymco = new Motorcycle("Kymco", LocalDate.now(), "ENG654321", "Sold", "Used", 1);
         inventory.put(HashEngineNumber("ENG654321"), kymco); // ADD TO INVENTORY
-        bst.Insert(kymco); // ADD TO BST
+        avl.Insert(kymco); // ADD TO BST
 
         // ADD SAMPLE YAMAHA ITEM
         Motorcycle yamaha = new Motorcycle("Yamaha", LocalDate.now(), "ENG789012", "On-hand", "New", 5);
         inventory.put(HashEngineNumber("ENG789012"), yamaha); // ADD TO INVENTORY
-        bst.Insert(yamaha); // ADD TO BST
+        avl.Insert(yamaha); // ADD TO BST
 
         // ADD SAMPLE SUZUKI ITEM
         Motorcycle suzuki = new Motorcycle("Suzuki", LocalDate.now(), "ENG456789", "Sold", "Used", 2);
         inventory.put(HashEngineNumber("ENG456789"), suzuki); // ADD TO INVENTORY
-        bst.Insert(suzuki); // ADD TO BST
+        avl.Insert(suzuki); // ADD TO BST
 
         // ADD SAMPLE KAWASAKI ITEM
         Motorcycle kawasaki = new Motorcycle("Kawasaki", LocalDate.now(), "ENG987654", "On-hand", "New", 4);
         inventory.put(HashEngineNumber("ENG987654"), kawasaki); // ADD TO INVENTORY
-        bst.Insert(kawasaki); // ADD TO BST
+        avl.Insert(kawasaki); // ADD TO BST
     }
 }
