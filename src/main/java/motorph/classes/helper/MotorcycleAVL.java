@@ -8,7 +8,7 @@ public class MotorcycleAVL {
 
     private TreeNode root;
 
-    // Insert a motorcycle while maintaining balance
+    // INSERT A MOTORCYCLE WHILE MAINTAINING BALANCE
     public void Insert(Motorcycle motorcycle) {
         root = InsertRec(root, motorcycle);
     }
@@ -18,42 +18,42 @@ public class MotorcycleAVL {
             return new TreeNode(motorcycle);
         }
 
-        // Sort based on engine number (can be changed to any other property)
-        if (motorcycle.GetEngineNumber().compareTo(node.motorcycle.GetEngineNumber()) < 0) {
+        // SORT BASED ON BRAND
+        if (motorcycle.GetBrand().compareToIgnoreCase(node.motorcycle.GetBrand()) < 0) {
             node.left = InsertRec(node.left, motorcycle);
         } else {
             node.right = InsertRec(node.right, motorcycle);
         }
 
-        // Update height
-        node.height = 1 + Math.max(GetHeight(node.left), GetHeight(node.right));
+        // UPDATE HEIGHT
+        node.height = 1 + Math.max(node.GetHeight(node.left), node.GetHeight(node.right));
 
-        // Balance the tree
+        // BALANCE THE TREEf
         return Balance(node);
     }
 
-    // Delete a motorcycle while maintaining balance
-    public void Delete(String engineNumber) {
-        root = DeleteRec(root, engineNumber);
+    // DELETE MOTORCYCLE WHILE MAINTAINING BALANCE
+    public void Delete(String brand) {
+        root = DeleteRec(root, brand);
     }
 
-    private TreeNode DeleteRec(TreeNode node, String engineNumber) {
+    private TreeNode DeleteRec(TreeNode node, String brand) {
         if (node == null) {
             return null;
         }
 
-        if (engineNumber.compareTo(node.motorcycle.GetEngineNumber()) < 0) {
-            node.left = DeleteRec(node.left, engineNumber);
-        } else if (engineNumber.compareTo(node.motorcycle.GetEngineNumber()) > 0) {
-            node.right = DeleteRec(node.right, engineNumber);
+        if (brand.compareToIgnoreCase(node.motorcycle.GetBrand()) < 0) {
+            node.left = DeleteRec(node.left, brand);
+        } else if (brand.compareToIgnoreCase(node.motorcycle.GetBrand()) > 0) {
+            node.right = DeleteRec(node.right, brand);
         } else {
-            // Node found - perform deletion
+            // NODE FOUND - PERFORM DELETE
             if (node.left == null || node.right == null) {
                 node = (node.left != null) ? node.left : node.right;
             } else {
                 TreeNode successor = FindMin(node.right);
                 node.motorcycle = successor.motorcycle;
-                node.right = DeleteRec(node.right, successor.motorcycle.GetEngineNumber());
+                node.right = DeleteRec(node.right, successor.motorcycle.GetBrand());
             }
         }
 
@@ -61,14 +61,14 @@ public class MotorcycleAVL {
             return null;
         }
 
-        // Update height
-        node.height = 1 + Math.max(GetHeight(node.left), GetHeight(node.right));
+        // UPDATE HEIGHT
+        node.height = 1 + Math.max(node.GetHeight(node.left), node.GetHeight(node.right));
 
-        // Balance the tree
+        // BALANCE THE TREE
         return Balance(node);
     }
 
-    // Search for a motorcycle by engine number
+    // Search for a motorcycle by brand
     public Set<String> Search(String criteria) {
         Set<String> results = new HashSet<>();
         SearchRec(root, criteria, results);
@@ -94,7 +94,7 @@ public class MotorcycleAVL {
                 || node.motorcycle.GetStatus().toLowerCase().contains(criteria)
                 || node.motorcycle.GetStockLabel().toLowerCase().contains(criteria)
                 || (stockCount != null && node.motorcycle.GetStockCount() == stockCount)) {
-            results.add(node.motorcycle.GetEngineNumber());
+            results.add(node.motorcycle.GetBrand());
         }
 
         SearchRec(node.left, criteria, results);
@@ -133,8 +133,8 @@ public class MotorcycleAVL {
         y.left = T2;
 
         // UPDATE HEIGHTS
-        y.height = 1 + Math.max(GetHeight(y.left), GetHeight(y.right));
-        x.height = 1 + Math.max(GetHeight(x.left), GetHeight(x.right));
+        y.height = 1 + Math.max(y.GetHeight(y.left), y.GetHeight(y.right));
+        x.height = 1 + Math.max(x.GetHeight(x.left), x.GetHeight(x.right));
 
         return x;
     }
@@ -148,20 +148,15 @@ public class MotorcycleAVL {
         x.right = T2;
 
         // UPDATE HEIGHTS
-        x.height = 1 + Math.max(GetHeight(x.left), GetHeight(x.right));
-        y.height = 1 + Math.max(GetHeight(y.left), GetHeight(y.right));
+        x.height = 1 + Math.max(x.GetHeight(x.left), x.GetHeight(x.right));
+        y.height = 1 + Math.max(y.GetHeight(y.left), y.GetHeight(y.right));
 
         return y;
     }
 
-    // GET THE HEIGHT OF A NODE
-    private int GetHeight(TreeNode node) {
-        return (node == null) ? 0 : node.height;
-    }
-
     // GET THE BALANCE FACTOR OF THE NODE
     private int GetBalanceFactor(TreeNode node) {
-        return (node == null) ? 0 : GetHeight(node.left) - GetHeight(node.right);
+        return (node == null) ? 0 : node.GetHeight(node.left) - node.GetHeight(node.right);
     }
 
     // FIND THE MINIMUM NODE IN A SUBTREE

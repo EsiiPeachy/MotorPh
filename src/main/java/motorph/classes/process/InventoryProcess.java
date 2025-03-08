@@ -38,35 +38,55 @@ public class InventoryProcess {
     // METHOD TO ADD A NEW MOTORCYCLE ITEM TO THE INVENTORY
     public void AddItem() {
         String brand = SelectBrand(); // SELECT A VALID BRAND
-        // VALIDATION CHECK: IF [brand] IS NULL, STOP THE METHOD FROM PROCEEDING
         if (brand == null) {
             return;
         }
 
-        // IF [brand] IS NOT NULL, ASK USER TO INPUT ENGINE NUMBER
-        System.out.print("Enter Engine Number: ");
-        // STORE USER INPUT INTO VARIABLE
-        String engineNo = scanner.nextLine();
+        // VALIDATE ENGINE NUMBER INPUT (ENSURE NUMERIC & MAX 6 DIGITS)
+        int engineNumber;
+        while (true) {
+            System.out.print("Enter Engine Number (max 6 digits, numeric): ");
+            if (scanner.hasNextInt()) {
+                engineNumber = scanner.nextInt();
+                scanner.nextLine(); // Consume newline
 
-        // HASH THE ENGINE NUMBER
+                // CHECK IF ENGINE NUMBER EXCEEDS 6 DIGITS
+                if (engineNumber >= 0 && engineNumber <= 999999) {
+                    break;
+                } else {
+                    System.out.println("Error: Engine number must be a numeric value with up to 6 digits.");
+                }
+            } else {
+                System.out.println("Error: Engine number must be a number.");
+                scanner.nextLine(); // Consume invalid input
+            }
+        }
+
+        String engineNo = FormatEngineNumber(engineNumber); // Format engine number
         String hashedEngineNo = HashEngineNumber(engineNo);
-        // VALIDATION CHECK: IF ENGINE NUMBER ALREADY EXISTS IN THE INVENTORY
+
         if (inventory.containsKey(hashedEngineNo)) {
             System.out.println("Error: Engine number already exists in the inventory.");
             return;
         }
 
-        // IF [brand] IS NOT NULL, ASK USER TO QUANTITY
-        System.out.print("Enter Quantity: ");
-        // STORE USER INPUT INTO VARIABLE
-        int quantity = scanner.nextInt();
+        // VALIDATE QUANTITY INPUT
+        int quantity;
+        while (true) {
+            System.out.print("Enter Quantity: ");
+            if (scanner.hasNextInt()) {
+                quantity = scanner.nextInt();
+                scanner.nextLine(); // Consume newline
+                break;
+            } else {
+                System.out.println("Error: Quantity must be a number.");
+                scanner.nextLine(); // Consume invalid input
+            }
+        }
 
-        // CALL METHOD TO CREATE MOTORCYCLE OBJECT
+        // CREATE AND ADD MOTORCYCLE
         Motorcycle motorcycle = CreateMotorcycle(brand, engineNo, quantity);
-        // ADD THE CREATED MOTORCYCLE OBJECT TO THE INVENTORY MAP
         inventory.put(hashedEngineNo, motorcycle);
-
-        // ADD THE CREATED MOTORCYCLE OBJECT TO THE BINARY SEARCH TREE
         avl.Insert(motorcycle);
 
         System.out.println(brand.substring(0, 1).toUpperCase() + brand.substring(1)
@@ -98,6 +118,7 @@ public class InventoryProcess {
     }
 
     public void SortInventory() {
+        List<Motorcycle> motorcycles = new ArrayList<>(inventory.values());
         while (true) {
             System.out.println("\n===== Select Sort Order =====");
             System.out.println("1. Ascending");
@@ -108,11 +129,13 @@ public class InventoryProcess {
             int choice = GetValidChoice();
             switch (choice) {
                 case 1 -> {
-                    MergeSort(0, inventory.size() - 1, true);
+                    MergeSort(motorcycles, 0, motorcycles.size() - 1, true); // TRUE = ASCENDING ORDER
+                    UpdateInventory(motorcycles);
                     return;
                 }
                 case 2 -> {
-                    MergeSort(0, inventory.size() - 1, false);
+                    MergeSort(motorcycles, 0, motorcycles.size() - 1, false); // FALSE = DESCENDING ORDER
+                    UpdateInventory(motorcycles);
                     return;
                 }
                 case 3 -> {
@@ -150,35 +173,26 @@ public class InventoryProcess {
         DisplayResults(results);
     }
 
-    /**
-     * MERGE SORT RECURSIVE FUNCTION
-     */
-    private void MergeSort(int left, int right, boolean ascending) {
-        // EXTRACT VALUES INTO A LIST
-        List<Motorcycle> motorcycles = new ArrayList<>(inventory.values());
+    // METHOD TO FORMAT ENGINE NUMBER
+    private String FormatEngineNumber(int number) {
+        return String.format("ENG%06d", number);
+    }
 
+    // MERGE SORT RECURSIVE FUNCTION
+    private void MergeSort(List<Motorcycle> motorcycles, int left, int right, boolean ascending) {
         if (left < right) {
             int mid = left + (right - left) / 2;
 
             // RECURSIVELY SORT LEFT & RIGHT HALVES
-            MergeSort(left, mid, ascending);
-            MergeSort(mid + 1, right, ascending);
+            MergeSort(motorcycles, left, mid, ascending);
+            MergeSort(motorcycles, mid + 1, right, ascending);
 
             // MERGE THE SORTED HALVES
             Merge(motorcycles, left, mid, right, ascending);
         }
-
-        // REPOPULATE THE INVENTORY
-        inventory.clear();
-        for (Motorcycle m : motorcycles) {
-            String hashedEngineNo = HashEngineNumber(m.GetEngineNumber());
-            inventory.put(hashedEngineNo, m);
-        }
     }
 
-    /**
-     * MERGES TWO SORTED HALVES
-     */
+    // MERGES TWO SORTED HALVES
     private void Merge(List<Motorcycle> list, int left, int mid, int right, boolean ascending) {
         int n1 = mid - left + 1;
         int n2 = right - mid;
@@ -189,9 +203,9 @@ public class InventoryProcess {
 
         int i = 0, j = 0, k = left;
 
-        // MERGE LOGIC
+        // MERGE LOGIC - SORTING BY BRAND
         while (i < n1 && j < n2) {
-            int comparison = leftList.get(i).GetEngineNumber().compareTo(rightList.get(j).GetEngineNumber());
+            int comparison = leftList.get(i).GetBrand().compareToIgnoreCase(rightList.get(j).GetBrand());
             if ((ascending && comparison <= 0) || (!ascending && comparison > 0)) {
                 list.set(k++, leftList.get(i++));
             } else {
@@ -205,6 +219,15 @@ public class InventoryProcess {
         }
         while (j < n2) {
             list.set(k++, rightList.get(j++));
+        }
+    }
+
+    // UPDATES THE INVENTORY AFTER SORTINGQ
+    private void UpdateInventory(List<Motorcycle> sortedList) {
+        inventory.clear();
+        for (Motorcycle m : sortedList) {
+            String hashedEngineNo = HashEngineNumber(m.GetEngineNumber());
+            inventory.put(hashedEngineNo, m);
         }
     }
 
@@ -243,7 +266,8 @@ public class InventoryProcess {
 
             // VALIDATION CHECK: IF USER INPUT MATCHES ANY OF THE OPTIONS GIVEN
             if (choice >= 1 && choice <= 5) {
-                return brands[choice - 1]; // Convert to zero-based index
+                String brand = brands[choice - 1]; // GET BRAND FROM ARRAY
+                return brand.substring(0, 1).toUpperCase() + brand.substring(1).toLowerCase();
             } else {
                 System.out.println("Invalid choice. Try again.");
             }

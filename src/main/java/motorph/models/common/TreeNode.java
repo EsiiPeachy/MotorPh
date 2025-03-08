@@ -12,4 +12,9 @@ public class TreeNode {
         this.left = this.right = null;
         this.height = 1;  // Initialize height to 1 (leaf node)
     }
+    
+    // GETTER
+    public int GetHeight(TreeNode node) {
+        return (node == null) ? 0 : node.height;
+    }
 }
