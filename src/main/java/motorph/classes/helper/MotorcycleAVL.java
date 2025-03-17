@@ -94,7 +94,7 @@ public class MotorcycleAVL {
                 || node.motorcycle.GetStatus().toLowerCase().contains(criteria)
                 || node.motorcycle.GetStockLabel().toLowerCase().contains(criteria)
                 || (stockCount != null && node.motorcycle.GetStockCount() == stockCount)) {
-            results.add(node.motorcycle.GetBrand());
+            results.add(node.motorcycle.GetEngineNumber());
         }
 
         SearchRec(node.left, criteria, results);

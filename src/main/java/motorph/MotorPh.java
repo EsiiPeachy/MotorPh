@@ -1,4 +1,3 @@
-
 package motorph;
 
 import motorph.classes.process.InventoryProcess;
@@ -76,7 +75,7 @@ public class MotorPh {
             // IF USER INPUT IS NOT A NUMBER, PRINT ERROR MESSAGE
             System.out.println("Invalid input. Enter a number.");
             scanner.next(); // CLEAR THE INVALID INPUT
-            System.out.print("Enter choice: "); 
+            System.out.print("Enter choice: ");
         }
         // IF THE USER INPUT IS A NUMBER, RETURN THE VALUE BACK TO WHERE THE METHOD IS CALLED FROM/ 
         return scanner.nextInt();

@@ -163,7 +163,8 @@ public class InventoryProcess {
         Map<String, Motorcycle> results = new HashMap<>();
         // LOOP THROUGH THE ENGINE NUMBERS AND RETRIEVE THE CORRESPONDING MOTORCYCLE OBJECTS
         for (String engineNumber : keys) {
-            Motorcycle motorcycle = inventory.get(engineNumber);
+            String hashedEngineNo = HashEngineNumber(engineNumber);
+            Motorcycle motorcycle = inventory.get(hashedEngineNo);
             if (motorcycle != null) {
                 results.put(engineNumber, motorcycle);
             }
