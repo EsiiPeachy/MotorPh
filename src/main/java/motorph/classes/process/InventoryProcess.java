@@ -1,5 +1,5 @@
 /**
- * VERSION CONTROL : 1.2
+ * VERSION CONTROL : 1.4
  */
 package motorph.classes.process;
 
@@ -127,6 +127,8 @@ public class InventoryProcess {
             System.out.print("Enter choice: ");
 
             int choice = GetValidChoice();
+            scanner.nextLine(); // CONSUME NEWLINE
+            
             switch (choice) {
                 case 1 -> {
                     MergeSort(motorcycles, 0, motorcycles.size() - 1, true); // TRUE = ASCENDING ORDER
@@ -264,6 +266,7 @@ public class InventoryProcess {
             System.out.print("Enter choice: ");
             // USER INPUT IS STORED IN A VARIABLE
             int choice = GetValidChoice();
+            scanner.nextLine(); // CONSUME NEWLINE
 
             // VALIDATION CHECK: IF USER INPUT MATCHES ANY OF THE OPTIONS GIVEN
             if (choice >= 1 && choice <= 5) {
